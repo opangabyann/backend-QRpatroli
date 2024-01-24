@@ -1,19 +1,31 @@
-const multer = require('multer');
-const path = require('path');
+const multer = require("multer");
+const path = require("path");
 
 const storage = multer.diskStorage({
-    destination : function (req , file ,cb) {
-        cb(null,path.join(__dirname,'uploads'));
-    },
-    //konfigurasi penamaan yang unik
-    filename : function (req, file , cb){
-        cb(
-            null,
-            file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-        );
-    }
-})
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "uploads"));
+  },
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
+    );
+  },
+});
 
-const uploadSingle = multer ({storage : storage}).single('file')
+// const fileFilter = (req, file, cb) => {
+//   // Hanya izinkan format jpg dan png
+//   if (file.mimetype === "image/jpeg" || file.mimetype === "image/png" || file.mimetype === "image/jpg") {
+//     cb(null, true);
+//   } else {
+//     cb(new Error("Format file tidak didukung"), false);
+//   }
+// };
 
-module.exports = uploadSingle
+const uploadSingle = multer({
+  storage: storage,
+  limits: { fileSize: 500 * 1024 }, // Batasan ukuran file (1 MB)
+  // fileFilter: fileFilter, // Menggunakan filter file
+}).single("file");
+
+module.exports = uploadSingle;

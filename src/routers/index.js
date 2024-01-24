@@ -4,173 +4,41 @@ const fs = require('fs');
 const authMiddleware = require('../middleware/auth');
 
 const routers = express.Router();
-const multer = require('multer');
+const { tambahUser, login } = require('../controllers/authController');
+const { getListUser, deleteUser, detailUser, updateUser } = require('../controllers/userController');
+const { getListTitikPatroli, tambahTitik, deletepatroli, updatepatroli, detailTitik } = require('../controllers/titikPatroli');
+const { tambahLog, getListLog, deletelog, updatelog, detaillog } = require('../controllers/logPatroliController');
+const { tambahLaporan, getListLaporan, updateLaporan, deletelaporan, detailLaporan } = require('../controllers/laporanController');
+const jwtValidateMiddleware = require('../middleware/jwtValidatemiddleware');
 const uploadSingle = require('../storage/fileuploadsingle');
-const uploadMulti = require('../storage/fileuploadMulti');
 
-// const imageFilter = (req, file, cb) => {
-//   if (!file.originalname.match(/\.(jpg/jpeg/png/gif)$/)) {
-//     return cb(null, false)
-//   }
-//   cb(null, true)
-// }
-const upload = multer({
-  dest: 'public',
-  //  fileFilter: imageFilter
-});
-const multipleUpload = multer({ dest: 'public' });
-
-// =========================== GET ========================= //
-routers.use(authMiddleware)
-
-routers.get('/', (req, res) => {
-  res.send('Hello world');
-});
-
-routers.get('/user', (req, res) => {
-  res.send({
-    status: 200,
-    message: 'Success',
-    data: {
-      nama: 'Hilmi',
-    },
-  });
-});
-routers.get('/absensi/:nama', (req, res) => {
-  let { status, dariTanggal, sampaiTanggal } = req.query;
-  let { nama } = req.params;
-  res.send({
-    status: 200,
-    message: 'Success',
-    data: {
-      nama: nama,
-      status: status,
-      dari_tanggal: dariTanggal,
-      sampai_tanggal: sampaiTanggal,
-    },
-  });
-});
-routers.get('/siswa/:nama', (req, res) => {
-  // let nama = req.params.nama;
-  let { nama } = req.params;
-  let { angkatan, sekolah } = req.query;
-
-  console.log('params =>', req.params);
-  console.log('query =>', req.query);
-
-  res.send({
-    status: 200,
-    message: 'Siswa ditemukan',
-    data: {
-      nama: `${nama}`,
-      kelas: `${req.query.kelas}`,
-      angkatan: `${angkatan}`,
-      sekolah: `${sekolah}`,
-    },
-  });
-});
-
-// =========================== POST ========================= //
-routers.post("/user/create", (req,res)=> {
-
-  const payload = req.body
-  res.json({
-    status : "Success",
-    msg : "Latihan request body",
-    payload : payload
-  })
+routers.post("/login", login);
+routers.get('/tes',(req,res)=>{
+    res.send("hello world")
 })
+routers.use(jwtValidateMiddleware);  
+routers.post("/tambah-user", tambahUser);
+  
+routers.get("/user/list", getListUser); // get list user
+routers.delete("/user/delete/:id", deleteUser); 
+routers.get("/user/detail/:id", detailUser);
+routers.put("/user/update/:id", updateUser);
 
-routers.post('/', authMiddleware, (req, res) => {
-    res.send('Hello world');
-  });
-  routers.get('/user', (req, res) => {
-    res.send({
-      status: 200,
-      message: 'Success',
-      data: {
-        nama: 'Hilmi',
-      },
-    });
-  });
-  routers.post('/user', (req, res) => {
-    const { nama, kelas } = req.body;
-    res.send({
-      status: 200,
-      message: 'Success',
-      data: {
-        nama: nama,
-        kelas: kelas,
-      },
-    });
-  });
+routers.post("/titik-patroli/tambah", uploadSingle,tambahTitik);
+routers.get("/titik-patroli/list", getListTitikPatroli); 
+routers.get("/titik-patroli/detail/:id", detailTitik);
+routers.delete("/titik-patroli/delete/:id", deletepatroli);
+routers.put("/titik-patroli/update/:id", uploadSingle,updatepatroli);
 
-  routers.post("/upload/multi", uploadMulti, (req, res) => {
-    const files = req.files;
-    const url = files.map((file, index) =>{
-      return `${req.protocol}://${req.get('host')}/${req.files[index].filename}`
-    })
-  
-    res.send({
-      status: 200,
-      message: 'Upload Success',
-      data: {
-        file: req.files,
-        fileURL: [
-          url
-        ]
-      },
-    });
-  });
+routers.post("/log-patroli/tambah", tambahLog);
+routers.get("/log-patroli/list", getListLog); 
+routers.get("/log-patroli/detail/:id", detaillog);
+routers.delete("/log-patroli/delete/:id", deletelog);
+routers.put("/log-patroli/update/:id", updatelog);
 
-  routers.post("/upload/single", uploadSingle , (req,res)=>{
-    res.send({
-      status : "Success",
-      msg : "Upload Success",
-      file : req.file,
-      fileUrl : `${req.protocol}://${req.get("host")}/${req.file.filename}`
-    })
-  })
-  
-  // routers.post('/upload', upload.single('file'), (req, res) => {
-  //   const file = req.file;
-  
-  //   if (file) {
-  //     const target = path.join(__dirname, 'public', file.originalname);
-  //     fs.renameSync(file.path, target);
-  //     url = `${req.protocol}://${req.get('host')}/${file.originalname}`;
-  //     console.log('url =>', url);
-  
-  //     res.send({
-  //       status: 200,
-  //       message: 'Success, File uploaded',
-  //       url: url,
-  //     });
-  //   } else {
-  //     res.send({
-  //       status: 400,
-  //       message: 'Error, File not found',
-  //     });
-  //   }
-  // });
-  // routers.post(
-  //   '/multipleUpload',
-  //   multipleUpload.array('file', 10),
-  //   (req, res) => {
-  //     const files = req.file;
-  
-  //     files.map((file) => {
-  //       if (file) {
-  //         const target = path.join(__dirname, 'public', file.originalname);
-  //         fs.renameSync(file.path, target);
-  //       }
-  //     });
-  
-  //     res.send({
-  //       status: 200,
-  //       message: 'Success, File uploaded',
-  //     });
-  //   }
-  // );
-  
-  module.exports = routers;
+routers.post("/laporan/tambah", uploadSingle,tambahLaporan);
+routers.get("/laporan/list", getListLaporan); 
+routers.get("/laporan/detail/:id", detailLaporan);
+routers.delete("/laporan/delete/:id", deletelaporan);
+routers.put("/laporan/update/:id", uploadSingle,updateLaporan);
+module.exports = routers;

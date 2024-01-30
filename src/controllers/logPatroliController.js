@@ -37,20 +37,7 @@ async function getListLog(req, res) {
       attributes: {
         exclude: ["createdAt", "updatedAt"],
       },
-      // where: {
-      //   [Op.or]: [
-      //     {
-      //       idUser: {
-      //         [Op.eq]: user,
-      //       },
-      //     },
-      //     {
-      //       idTitikPatroli: {
-      //         [Op.eq]: titikPatroli,
-      //       },
-      //     },
-      //   ],
-      // },
+    
       include: [
         {
           model: model.user,
@@ -62,7 +49,7 @@ async function getListLog(req, res) {
           model: model.titikPatroli,
           require: true,
           as: "titikPatrol",
-          attributes: ["id", "nama", "foto","latitude", "longitude"],
+          attributes: ["id", "nama", "foto", "latitude", "longitude"],
         },
       ],
       limit: pageSize,
@@ -135,6 +122,12 @@ async function detaillog(req, res) {
           require: true,
           as: "logUser",
           attributes: ["id", "nama", "nopek"],
+        },
+        {
+          model: model.titikPatroli,
+          require: true,
+          as: "titikPatrol",
+          attributes: ["id", "nama", "latitude", "longitude"],
         },
       ],
     });

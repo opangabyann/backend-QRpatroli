@@ -1,6 +1,7 @@
 const UserModel = require("../models").user;
 const model = require("../models");
 const { Op } = require("sequelize");
+const bcrypt = require("bcrypt");
 
 async function getListUser(req, res) {
   const { keyword, page, pageSize, offset } = req.query;
@@ -9,6 +10,20 @@ async function getListUser(req, res) {
       attributes: {
         exclude: ["createdAt", "updatedAt"],
       },
+      include: [
+        {
+          model: model.logPatroli,
+          require: true,
+          as: "logUser",
+          include: [
+            {
+              model: model.titikPatroli,
+              require: true,
+              as: "titikPatroli",
+            },
+          ],
+        },
+      ],
       where: {
         [Op.or]: [
           {
@@ -20,6 +35,9 @@ async function getListUser(req, res) {
       limit: pageSize,
       offset: offset,
     });
+
+
+    console.log(user);
 
     res.json({
       status: "Berhasil",
@@ -117,12 +135,12 @@ async function updateUser(req, res) {
         msg: "user tidak ditemukan",
       });
     }
-
+    let hashPassword = await bcrypt.hashSync(password, 10);
     await UserModel.update(
       {
         nama,
         nopek,
-        password,
+        password: hashPassword,
         role,
         noTelp,
       },
@@ -137,6 +155,7 @@ async function updateUser(req, res) {
       msg: "user berhasil diupdate",
     });
   } catch (error) {
+    console.log(error);
     res.json({
       status: "Gagal",
       msg: "ada kesalahan",

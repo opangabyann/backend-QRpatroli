@@ -104,7 +104,20 @@ async function detailUser(req, res) {
         "createdAt",
         "updatedAt",
       ],
-
+      include: [
+        {
+          model: model.logPatroli,
+          require: true,
+          as: "logUser",
+          include: [
+            {
+              model: model.titikPatroli,
+              require: true,
+              as: "titikPatroli",
+            },
+          ],
+        },
+      ],
       where: {
         id: id,
       },

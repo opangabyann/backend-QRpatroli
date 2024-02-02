@@ -19,7 +19,7 @@ async function getListUser(req, res) {
             {
               model: model.titikPatroli,
               require: true,
-              as: "titikPatroli",
+              as: "titikPatrol",
             },
           ],
         },
@@ -38,7 +38,62 @@ async function getListUser(req, res) {
 
 
     console.log(user);
+    res.json({
+      status: "Berhasil",
+      msg: "user berhasil ditemukan",
+      pagination: {
+        currentPage: page,
+        pageSize: pageSize,
+        totalData: user.count,
+      },
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({
+      status: "Gagal",
+      msg: "Ada kesalahan",
+      err: error,
+    });
+  }
+}
 
+async function getListUserSecurity(req, res) {
+  const { keyword, page, pageSize, offset } = req.query;
+  try {
+    const user = await UserModel.findAndCountAll({
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+      include: [
+        {
+          model: model.logPatroli,
+          require: true,
+          as: "logUser",
+          include: [
+            {
+              model: model.titikPatroli,
+              require: true,
+              as: "titikPatrol",
+            },
+          ],
+        },
+      ],
+      where: {
+        role : "security",
+        [Op.or]: [
+          {
+            nama: { [Op.substring]: keyword },
+          },
+        ], // Filter null values jika role atau keyword kosong
+      },
+
+      limit: pageSize,
+      offset: offset,
+    });
+
+
+    console.log(user);
     res.json({
       status: "Berhasil",
       msg: "user berhasil ditemukan",
@@ -113,7 +168,7 @@ async function detailUser(req, res) {
             {
               model: model.titikPatroli,
               require: true,
-              as: "titikPatroli",
+              as: "titikPatrol",
             },
           ],
         },
@@ -175,4 +230,4 @@ async function updateUser(req, res) {
     });
   }
 }
-module.exports = { getListUser, deleteUser, detailUser, updateUser };
+module.exports = { getListUser, deleteUser, detailUser, updateUser,getListUserSecurity };

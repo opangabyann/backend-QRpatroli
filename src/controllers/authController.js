@@ -23,6 +23,12 @@ async function login(req, res) {
         msg: "user tidak ditemukan",
       });
     }
+    if (user.role === "security"){
+      return res.json({
+        status: "Gagal",
+        msg: "hanya admin yang dapat login!!",
+      });
+    }
     if (password === null) {
       return res.status(422).json({
         status: "Fail",

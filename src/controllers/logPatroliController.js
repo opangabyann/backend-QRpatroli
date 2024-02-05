@@ -48,7 +48,7 @@ async function getListLog(req, res) {
         {
           model: model.titikPatroli,
           require: true,
-          as: "titikPatrol",
+          as: "titikPatroli",
           attributes: ["id", "nama", "foto", "latitude", "longitude"],
         },
       ],
@@ -126,7 +126,7 @@ async function detaillog(req, res) {
         {
           model: model.titikPatroli,
           require: true,
-          as: "titikPatrol",
+          as: "titikPatroli",
           attributes: ["id", "nama", "latitude", "longitude"],
         },
       ],

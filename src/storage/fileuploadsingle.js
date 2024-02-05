@@ -24,7 +24,8 @@ const storage = multer.diskStorage({
 
 const uploadSingle = multer({
   storage: storage,
-  limits: { fileSize: 500 * 1024 }, // Batasan ukuran file (1 MB)
+  limits: { fileSize: 3 * 1024 * 1024 },
+  // Batasan ukuran file (1 MB)
   // fileFilter: fileFilter, // Menggunakan filter file
 }).single("file");
 

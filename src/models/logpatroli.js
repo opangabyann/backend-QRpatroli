@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class logPatroli extends Model {
     /**
@@ -11,26 +9,29 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      logPatroli.belongsTo(models.titikPatroli,{
-        as: "titikPatrol",
-        foreignKey : "idTitikPatroli"
-      })
+      logPatroli.belongsTo(models.titikPatroli, {
+        as: "titikPatroli",
+        foreignKey: "idTitikPatroli",
+      });
       logPatroli.belongsTo(models.user, {
-        as : "logUser",
-        foreignKey : "idUser"
-      })
+        as: "logUser",
+        foreignKey: "idUser",
+      });
     }
   }
-  logPatroli.init({
-    idTitikPatroli: DataTypes.INTEGER,
-    idUser: DataTypes.INTEGER,
-    latitude: DataTypes.STRING,
-    longitude: DataTypes.STRING,
-    jamPatroli: DataTypes.STRING,
-    tanggalPatroli: DataTypes.DATE
-  }, {
-    sequelize,
-    modelName: 'logPatroli',
-  });
+  logPatroli.init(
+    {
+      idTitikPatroli: DataTypes.INTEGER,
+      idUser: DataTypes.INTEGER,
+      latitude: DataTypes.STRING,
+      longitude: DataTypes.STRING,
+      jamPatroli: DataTypes.STRING,
+      tanggalPatroli: DataTypes.DATE,
+    },
+    {
+      sequelize,
+      modelName: "logPatroli",
+    }
+  );
   return logPatroli;
 };

@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class titikPatroli extends Model {
     /**
@@ -11,22 +9,25 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      titikPatroli.hasMany(models.logPatroli,{
-        as: "titikPatrol",
-        foreignKey : "idTitikPatroli"
-      })
+      titikPatroli.hasOne(models.logPatroli, {
+        as: "titikPatroli",
+        foreignKey: "idTitikPatroli",
+      });
     }
   }
-  titikPatroli.init({
-    nama: DataTypes.STRING,
-    foto: DataTypes.STRING,
-    thumbnail_id: DataTypes.STRING,
-    latitude: DataTypes.STRING,
-    longitude: DataTypes.STRING,
-    deskripsi: DataTypes.STRING,
-  }, {
-    sequelize,
-    modelName: 'titikPatroli',
-  });
+  titikPatroli.init(
+    {
+      nama: DataTypes.STRING,
+      foto: DataTypes.STRING,
+      thumbnail_id: DataTypes.STRING,
+      latitude: DataTypes.STRING,
+      longitude: DataTypes.STRING,
+      deskripsi: DataTypes.STRING,
+    },
+    {
+      sequelize,
+      modelName: "titikPatroli",
+    }
+  );
   return titikPatroli;
 };

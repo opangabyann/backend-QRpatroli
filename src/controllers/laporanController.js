@@ -13,7 +13,7 @@ async function tambahLaporan(req, res) {
     console.log(secure_url);
     gambarLaporan = secure_url;
     thumbnail_id = public_id;
-    console.log(req.file)
+    console.log(req.file);
     const laporan = await laporanModel.create({
       idUser: req.id,
       latitude,
@@ -43,22 +43,30 @@ async function tambahLaporan(req, res) {
 }
 
 async function getListLaporan(req, res) {
-  const { keyword, page, pageSize, offset } = req.query;
+  const { keyword, page, pageSize, offset, jenisLaporan } = req.query;
+  console.log(jenisLaporan);
   try {
     const laporan = await laporanModel.findAndCountAll({
       attributes: {
         exclude: ["createdAt", "updatedAt"],
       },
-      //   where: {
-      //     [Op.or]: [
-      //       {
-      //         nama: { [Op.substring]: keyword },
-      //       },
-      //     ], // Filter null values jika role atau keyword kosong
-      //   },
-
       limit: pageSize,
       offset: offset,
+      include: [
+        {
+          model: model.user,
+          require: true,
+          as: "dataUser",
+        },
+      ],
+      where: {
+        [Op.or]: [
+          {
+            judulLaporan: { [Op.substring]: keyword },
+            jenisLaporan: { [Op.substring]: jenisLaporan },
+          },
+        ],
+      },
     });
 
     res.json({

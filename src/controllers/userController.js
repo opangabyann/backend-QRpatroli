@@ -25,6 +25,7 @@ async function getListUser(req, res) {
         },
       ],
       where: {
+        role: "security",
         [Op.or]: [
           {
             nama: { [Op.substring]: keyword },
@@ -35,7 +36,6 @@ async function getListUser(req, res) {
       limit: pageSize,
       offset: offset,
     });
-
 
     console.log(user);
 
@@ -139,7 +139,7 @@ async function updateUser(req, res) {
   try {
     const { id } = req.params;
     const payload = req.body;
-    const { nama, nopek, password, role, noTelp } = payload;
+    const { nama, nopek, role, noTelp } = payload;
     const user = await UserModel.findByPk(id);
 
     if (user === null) {
@@ -148,12 +148,10 @@ async function updateUser(req, res) {
         msg: "user tidak ditemukan",
       });
     }
-    let hashPassword = await bcrypt.hashSync(password, 10);
     await UserModel.update(
       {
         nama,
         nopek,
-        password: hashPassword,
         role,
         noTelp,
       },
@@ -163,7 +161,7 @@ async function updateUser(req, res) {
         },
       }
     );
-    res.json({
+    return res.json({
       status: "Berhasil",
       msg: "user berhasil diupdate",
     });
@@ -175,4 +173,30 @@ async function updateUser(req, res) {
     });
   }
 }
-module.exports = { getListUser, deleteUser, detailUser, updateUser };
+
+async function updatePassword(req, res) {
+  try {
+    const { id } = req.params;
+    const payload = req.body;
+    const { password } = payload;
+    let hashPassword = await bcrypt.hashSync(password, 10);
+    await UserModel.update({ password: hashPassword }, { where: { id: id } });
+    return res.json({
+      status: "Berhasil",
+      msg: "password berhasil diubah",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.json({
+      status: "Gagal",
+      msg: "ada kesalahan",
+    });
+  }
+}
+module.exports = {
+  getListUser,
+  deleteUser,
+  detailUser,
+  updateUser,
+  updatePassword,
+};

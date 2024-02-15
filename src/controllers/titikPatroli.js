@@ -4,13 +4,14 @@ const { post, del } = require("../controllers/cloudinaryController");
 const model = require("../models");
 const { Op } = require("sequelize");
 
-
 async function tambahTitik(req, res) {
   try {
     const payload = req.body;
-    let { nama, foto, thumbnail_id, latitude, longitude, deskripsi } =
-      payload;
-    const { secure_url, public_id } = await post(req?.file.path, "titikPatroli");
+    let { nama, foto, thumbnail_id, latitude, longitude, deskripsi } = payload;
+    const { secure_url, public_id } = await post(
+      req?.file.path,
+      "titikPatroli"
+    );
     console.log(secure_url);
     foto = secure_url;
     thumbnail_id = public_id;
@@ -22,6 +23,11 @@ async function tambahTitik(req, res) {
       thumbnail_id,
       deskripsi,
     });
+    if (!req.file) {
+      console.log(req.file);
+      console.log(payload);
+      return res.status(400).send("No file uploaded.");
+    }
     // console.log(laporan instanceof laporanModel);
     res.status(201).json({
       status: "Berhasil",
@@ -50,7 +56,7 @@ async function getListTitikPatroli(req, res) {
         [Op.or]: [
           {
             nama: {
-              [Op.substring] : keyword
+              [Op.substring]: keyword,
             },
           },
         ],
@@ -60,6 +66,13 @@ async function getListTitikPatroli(req, res) {
       offset: offset,
     });
 
+    if (patroli == null) {
+      res.status(403).json({
+        status: "Gagal",
+        msg: "lokasi patroli tidak ditemukan",
+      });
+    }
+
     res.json({
       status: "Berhasil",
       msg: "titik-titik patroli berhasil ditemukan",
@@ -68,7 +81,7 @@ async function getListTitikPatroli(req, res) {
         pageSize: pageSize,
         totalData: patroli.count,
       },
-      data: patroli,   
+      data: patroli,
     });
   } catch (error) {
     console.log(error);
@@ -85,26 +98,28 @@ async function deletepatroli(req, res) {
     const patroli = await patroliModel.findByPk(id);
 
     if (patroli === null) {
-      res.status(403).json({
+      return res.status(403).json({
         status: "Gagal",
         msg: "titik patroli tidak ditemukan",
       });
     }
+
     if (patroli.thumbnail_id) {
       await del(patroli.thumbnail_id);
     }
+
     await patroliModel.destroy({
       where: {
         id: id,
       },
     });
-    res.json({
+
+    return res.json({
       status: "Berhasil",
       msg: "titik patroli berhasil dihapus",
-      patroli: patroli,
     });
   } catch (error) {
-    res.status(403).json({
+    return res.status(403).json({
       status: "Gagal",
       msg: "Ada kesalahan",
       err: error,
@@ -122,13 +137,18 @@ async function detailTitik(req, res) {
       where: {
         id: id,
       },
-      
     });
-    res.json({
-      status: "Berhasil",
-      msg: "detail patroli berhasil ditemukan",
-      data: patroli,
-    });
+    if (patroli == null) {
+      res.status(403).json({
+        status: "Gagal",
+        msg: "lokasi patroli tidak ditemukan",
+      });
+    } else
+      res.json({
+        status: "Berhasil",
+        msg: "detail patroli berhasil ditemukan",
+        data: patroli,
+      });
   } catch (error) {
     console.log(error);
     res.json({
@@ -141,8 +161,7 @@ async function updatepatroli(req, res) {
   try {
     const { id } = req.params;
     const payload = req.body;
-    let {  nama,latitude, longitude, deskripsi } =
-      payload;
+    let { nama, latitude, longitude, deskripsi } = payload;
 
     const patroli = await patroliModel.findByPk(id);
 
@@ -157,7 +176,10 @@ async function updatepatroli(req, res) {
 
     if (req.file) {
       // Jika ada file yang diunggah, ganti foto dengan yang baru
-      const { secure_url, public_id } = await post(req?.file.path, "titikPatroli");
+      const { secure_url, public_id } = await post(
+        req?.file.path,
+        "titikPatroli"
+      );
       foto = secure_url;
       thumbnail_id = public_id;
 

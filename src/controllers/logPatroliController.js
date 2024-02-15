@@ -35,9 +35,9 @@ async function getListLog(req, res) {
   try {
     const log = await logModel.findAndCountAll({
       attributes: {
-        exclude: ["createdAt", "updatedAt"],
+        exclude: ["updatedAt"],
       },
-    
+
       include: [
         {
           model: model.user,
@@ -111,7 +111,7 @@ async function detaillog(req, res) {
     const { id } = req.params;
     const log = await logModel.findOne({
       attributes: {
-        exclude: ["createdAt", "updatedAt"],
+        exclude: ["updatedAt"],
       },
       where: {
         id: id,

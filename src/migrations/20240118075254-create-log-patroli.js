@@ -43,6 +43,9 @@ module.exports = {
       tanggalPatroli: {
         type: Sequelize.DATE
       },
+      status: {
+        type: Sequelize.ENUM('ditolak','menunggu', "dikonfirmasi")
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -50,7 +53,7 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
     });
   },
   async down(queryInterface, Sequelize) {

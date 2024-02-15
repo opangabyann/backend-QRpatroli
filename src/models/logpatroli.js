@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
       longitude: DataTypes.STRING,
       jamPatroli: DataTypes.STRING,
       tanggalPatroli: DataTypes.DATE,
+      status : DataTypes.ENUM('ditolak','menunggu', "dikonfirmasi")
     },
     {
       sequelize,

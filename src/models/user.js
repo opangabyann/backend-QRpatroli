@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      user.hasOne(models.laporan, {
+      user.hasMany(models.laporan, {
         as: "dataUser",
         foreignKey: "idUser",
       });
@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       nama: DataTypes.STRING,
       nopek: DataTypes.STRING,
       password: DataTypes.STRING,
-      role: DataTypes.ENUM("admin", "security"),
+      role: DataTypes.ENUM("admin", "security", "superAdmin"),
       noTelp: DataTypes.STRING,
     },
     {

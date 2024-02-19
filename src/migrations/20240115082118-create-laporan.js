@@ -44,6 +44,9 @@ module.exports = {
       deskripsi: {
         type: Sequelize.TEXT
       },
+      status: {
+        type: Sequelize.ENUM('ditolak','menunggu', "dikonfirmasi")
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

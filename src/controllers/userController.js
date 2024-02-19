@@ -25,6 +25,61 @@ async function getListUser(req, res) {
         },
       ],
       where: {
+        role: ["security", "admin"],
+        [Op.or]: [
+          {
+            nama: { [Op.substring]: keyword },
+          },
+        ], // Filter null values jika role atau keyword kosong
+      },
+
+      limit: pageSize,
+      offset: offset,
+    });
+
+    console.log(user);
+    return res.json({
+      status: "Berhasil",
+      msg: "user berhasil ditemukan",
+      pagination: {
+        currentPage: page,
+        pageSize: pageSize,
+        totalData: user.count,
+      },
+      data: user,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({
+      status: "Gagal",
+      msg: "Ada kesalahan",
+      err: error,
+    });
+  }
+}
+
+async function getListUserSecurity(req, res) {
+  const { keyword, page, pageSize, offset } = req.query;
+  try {
+    const user = await UserModel.findAndCountAll({
+      attributes: {
+        exclude: ["createdAt", "updatedAt"],
+      },
+      include: [
+        {
+          model: model.logPatroli,
+          require: true,
+          as: "logUser",
+          include: [
+            {
+              model: model.titikPatroli,
+              require: true,
+              as: "titikPatroli",
+            },
+          ],
+        },
+      ],
+      where: {
         role: "security",
         [Op.or]: [
           {
@@ -38,7 +93,6 @@ async function getListUser(req, res) {
     });
 
     console.log(user);
-
     res.json({
       status: "Berhasil",
       msg: "user berhasil ditemukan",
@@ -122,6 +176,12 @@ async function detailUser(req, res) {
         id: id,
       },
     });
+    if (user == null) {
+      return res.status(403).json({
+        status: "Gagal",
+        msg: "Petugas tidak ditemukan",
+      });
+    }
     res.json({
       status: "Berhasil",
       msg: "detail user berhasil ditemukan",
@@ -174,22 +234,31 @@ async function updateUser(req, res) {
   }
 }
 
-async function updatePassword(req, res) {
+async function updatePassword() {
   try {
     const { id } = req.params;
     const payload = req.body;
     const { password } = payload;
-    let hashPassword = await bcrypt.hashSync(password, 10);
-    await UserModel.update({ password: hashPassword }, { where: { id: id } });
-    return res.json({
-      status: "Berhasil",
-      msg: "password berhasil diubah",
-    });
+    const user = await UserModel.findByPk(id);
+
+    if (user == null) {
+      return res.json({
+        status: "Gagal",
+        msg: "user tidak ditemukan",
+      });
+    } else {
+      let hashPassword = await bcrypt.hashSync(password, 10);
+
+      await UserModel.update({ hashPassword }, { where: { id: id } });
+      return res.json({
+        status: "Berhasil",
+        msg: "Password berhasil dirubah",
+      });
+    }
   } catch (error) {
-    console.log(error);
     return res.json({
       status: "Gagal",
-      msg: "ada kesalahan",
+      msg: "Terjadi kesalahan",
     });
   }
 }
@@ -199,4 +268,5 @@ module.exports = {
   detailUser,
   updateUser,
   updatePassword,
+  getListUserSecurity,
 };

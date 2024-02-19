@@ -21,7 +21,7 @@ module.exports = {
         // allowNull: false
       },
       role: {
-        type: Sequelize.ENUM('admin','security')
+        type: Sequelize.ENUM('admin','security', 'superAdmin')
       },
       noTelp: {
         type: Sequelize.STRING

@@ -67,7 +67,7 @@ async function getListTitikPatroli(req, res) {
     });
 
     if (patroli == null) {
-      res.status(403).json({
+     return res.status(403).json({
         status: "Gagal",
         msg: "lokasi patroli tidak ditemukan",
       });

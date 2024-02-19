@@ -4,37 +4,13 @@ const fs = require("fs");
 const authMiddleware = require("../middleware/auth");
 
 const routers = express.Router();
-const { tambahUser, login } = require("../controllers/authController");
-const {
-  getListUser,
-  deleteUser,
-  detailUser,
-  updateUser,
-  updatePassword,
-} = require("../controllers/userController");
-const {
-  getListTitikPatroli,
-  tambahTitik,
-  deletepatroli,
-  updatepatroli,
-  detailTitik,
-} = require("../controllers/titikPatroli");
-const {
-  tambahLog,
-  getListLog,
-  deletelog,
-  updatelog,
-  detaillog,
-} = require("../controllers/logPatroliController");
-const {
-  tambahLaporan,
-  getListLaporan,
-  updateLaporan,
-  deletelaporan,
-  detailLaporan,
-} = require("../controllers/laporanController");
-const jwtValidateMiddleware = require("../middleware/jwtValidatemiddleware");
-const uploadSingle = require("../storage/fileuploadsingle");
+const { tambahUser, login } = require('../controllers/authController');
+const { getListUser, deleteUser, detailUser, updateUser, getListUserSecurity, updatePassword } = require('../controllers/userController');
+const { getListTitikPatroli, tambahTitik, deletepatroli, updatepatroli, detailTitik } = require('../controllers/titikPatroli');
+const { tambahLog, getListLog, deletelog, updatelog, detaillog } = require('../controllers/logPatroliController');
+const { tambahLaporan, getListLaporan, updateLaporan, deletelaporan, detailLaporan } = require('../controllers/laporanController');
+const jwtValidateMiddleware = require('../middleware/jwtValidatemiddleware');
+const uploadSingle = require('../storage/fileuploadsingle');
 
 routers.post("/login", login);
 routers.get("/tes", (req, res) => {
@@ -44,7 +20,8 @@ routers.use(jwtValidateMiddleware);
 routers.post("/tambah-user", tambahUser);
 
 routers.get("/user/list", getListUser); // get list user
-routers.delete("/user/delete/:id", deleteUser);
+routers.get("/user/list-security", getListUserSecurity); // get list user
+routers.delete("/user/delete/:id", deleteUser); 
 routers.get("/user/detail/:id", detailUser);
 routers.put("/user/update/:id", updateUser);
 routers.put("/user/update-password/:id", updatePassword);

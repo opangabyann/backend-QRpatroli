@@ -43,8 +43,8 @@ async function tambahLaporan(req, res) {
 }
 
 async function getListLaporan(req, res) {
-  const { keyword, page, pageSize, offset, jenisLaporan } = req.query;
-  console.log(jenisLaporan);
+  const { keyword, page, pageSize, offset, jenisLaporan, status } = req.query;
+  console.log(status);
   try {
     const laporan = await laporanModel.findAndCountAll({
       attributes: {
@@ -64,6 +64,7 @@ async function getListLaporan(req, res) {
           {
             judulLaporan: { [Op.substring]: keyword },
             jenisLaporan: { [Op.substring]: jenisLaporan },
+            status: { [Op.substring]: status },
           },
         ],
       },
@@ -157,7 +158,7 @@ async function updateLaporan(req, res) {
   try {
     const { id } = req.params;
     const payload = req.body;
-    let { latitude, longitude, judulLaporan, jenisLaporan, deskripsi } =
+    let { latitude, longitude, judulLaporan, jenisLaporan, deskripsi, status } =
       payload;
 
     const laporan = await laporanModel.findByPk(id);
@@ -190,6 +191,7 @@ async function updateLaporan(req, res) {
         jenisLaporan,
         gambarLaporan,
         deskripsi,
+        status,
       },
       {
         where: {

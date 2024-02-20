@@ -22,6 +22,8 @@ async function tambahTitik(req, res) {
       foto,
       thumbnail_id,
       deskripsi,
+      createdBy :req.id,
+      updatedBy :req.id
     });
     if (!req.file) {
       console.log(req.file);
@@ -52,6 +54,20 @@ async function getListTitikPatroli(req, res) {
       attributes: {
         exclude: ["createdAt", "updatedAt"],
       },
+      include: [
+        {
+          model: model.user,
+          require: true,
+          as: "createdby",
+          attributes: ["id", "nama", "nopek"],
+        },
+        {
+          model: model.user,
+          require: true,
+          as: "updatedby",
+          attributes: ["id", "nama", "nopek"],
+        },
+      ],
       where: {
         [Op.or]: [
           {
@@ -60,6 +76,7 @@ async function getListTitikPatroli(req, res) {
             },
           },
         ],
+
       },
 
       limit: pageSize,

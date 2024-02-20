@@ -31,7 +31,7 @@ async function tambahLog(req, res) {
   }
 }
 async function getListLog(req, res) {
-  const { keyword, page, pageSize, offset, user, titikPatroli } = req.query;
+  const { keyword, page, pageSize, offset, dari_jam,sampai_jam } = req.query;
   try {
     const log = await logModel.findAndCountAll({
       attributes: {
@@ -52,6 +52,12 @@ async function getListLog(req, res) {
           attributes: ["id", "nama", "foto", "latitude", "longitude"],
         },
       ],
+
+      where : {
+        jamPatroli : {
+          [Op.between] : [dari_jam,sampai_jam]
+        },
+      },
       limit: pageSize,
       offset: offset,
     });

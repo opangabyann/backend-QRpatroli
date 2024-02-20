@@ -26,6 +26,12 @@ module.exports = {
       noTelp: {
         type: Sequelize.STRING
       },
+      createdBy:{
+        type: Sequelize.INTEGER,
+      },
+      updatedBy:{
+        type: Sequelize.INTEGER,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

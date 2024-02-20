@@ -27,6 +27,28 @@ module.exports = {
       deskripsi: {
         type: Sequelize.STRING
       },
+      createdBy:{
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        onDelete :  'CASCADE',
+        onUpdate : 'CASCADE',
+        references : {
+          model : "users",
+          key : "id",
+          as : "createdBy"
+        }
+      },
+      updatedBy:{
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        onDelete :  'CASCADE',
+        onUpdate : 'CASCADE',
+        references : {
+          model : "users",
+          key : "id",
+          as : "updatedBy"
+        }
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

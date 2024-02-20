@@ -17,6 +17,14 @@ module.exports = (sequelize, DataTypes) => {
         as: "logUser",
         foreignKey: "idUser",
       });
+      user.hasOne(models.titikPatroli, {
+        as: "createdby",
+        foreignKey: "createdBy",
+      });
+      user.hasOne(models.titikPatroli, {
+        as: "updatedby",
+        foreignKey: "updatedBy",  
+      });
     }
   }
   user.init(
@@ -26,6 +34,8 @@ module.exports = (sequelize, DataTypes) => {
       password: DataTypes.STRING,
       role: DataTypes.ENUM("admin", "security", "superAdmin"),
       noTelp: DataTypes.STRING,
+      createdBy: DataTypes.INTEGER,
+      updatedBy: DataTypes.INTEGER,
     },
     {
       sequelize,

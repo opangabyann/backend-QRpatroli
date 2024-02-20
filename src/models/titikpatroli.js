@@ -13,6 +13,14 @@ module.exports = (sequelize, DataTypes) => {
         as: "titikPatroli",
         foreignKey: "idTitikPatroli",
       });
+      titikPatroli.belongsTo(models.user, {
+        as: "createdby",
+        foreignKey: "createdBy",
+      });
+      titikPatroli.belongsTo(models.user, {
+        as: "updatedby",
+        foreignKey: "updatedBy",
+      });
     }
   }
   titikPatroli.init(
@@ -23,6 +31,8 @@ module.exports = (sequelize, DataTypes) => {
       latitude: DataTypes.STRING,
       longitude: DataTypes.STRING,
       deskripsi: DataTypes.STRING,
+      createdBy: DataTypes.INTEGER,
+      updatedBy: DataTypes.INTEGER,
     },
     {
       sequelize,

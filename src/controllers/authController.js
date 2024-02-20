@@ -81,7 +81,13 @@ async function tambahUser(req, res) {
         nopek: nopek,
       },
     });
-
+    console.log("existing user ====>",existingUser)
+    // if(req.role !== "superAdmin"){
+    //   res.status(400).json({
+    //     status: "Gagal",
+    //     msg: "Hanya super admin yang dapat menambah user",
+    //   });
+    // }
     // Jika user dengan nomor pegawai tersebut sudah ada
     if (existingUser) {
       return res.status(400).json({
@@ -97,6 +103,7 @@ async function tambahUser(req, res) {
       password: hashPassword,
       role,
       noTelp,
+      createdBy: req.id
     });
     res.json({
       status: "Berhasil",

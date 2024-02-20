@@ -2,6 +2,7 @@ const logModel = require("../models").logPatroli;
 const model = require("../models");
 const { Op } = require("sequelize");
 const dayjs = require("dayjs");
+const checkQuery = require("../utils/queryString");
 
 async function tambahLog(req, res) {
   try {
@@ -54,9 +55,11 @@ async function getListLog(req, res) {
       ],
 
       where : {
-        jamPatroli : {
-          [Op.between] : [dari_jam,sampai_jam]
-        },
+        ...(checkQuery(keyword) && {
+          jamPatroli : {
+            [Op.between] : [dari_jam, sampai_jam]
+          }
+        }),
       },
       limit: pageSize,
       offset: offset,

@@ -3,15 +3,23 @@ const model = require("../models");
 const { Op } = require("sequelize");
 const { post, del } = require("../controllers/cloudinaryController");
 const dayjs = require("dayjs");
+const checkQuery = require("../utils/queryString");
 
 async function tambahLaporan(req, res) {
   try {
     const payload = req.body;
-    let { idUser, latitude, longitude, judulLaporan, jenisLaporan, deskripsi } =
-      payload;
+    let {
+      idUser,
+      latitude,
+      longitude,
+      judulLaporan,
+      jenisLaporan,
+      deskripsi,
+      status,
+    } = payload;
     const { secure_url, public_id } = await post(req?.file.path, "laporan");
     console.log(secure_url);
-    gambarLaporan = secure_url;
+    const gambarLaporan = secure_url;
     thumbnail_id = public_id;
     console.log(req.file);
     const laporan = await laporanModel.create({
@@ -24,6 +32,7 @@ async function tambahLaporan(req, res) {
       gambarLaporan,
       thumbnail_id,
       deskripsi,
+      status,
     });
     console.log(laporan instanceof laporanModel);
     res.status(201).json({
@@ -43,9 +52,20 @@ async function tambahLaporan(req, res) {
 }
 
 async function getListLaporan(req, res) {
-  const { keyword, page, pageSize, offset, jenisLaporan, status } = req.query;
+  const {
+    keyword,
+    page,
+    pageSize,
+    offset,
+    jenisLaporan,
+    status,
+    nama_pelapor,
+    tanggal,
+  } = req.query;
   console.log(status);
   try {
+    const date = tanggal ? new Date(tanggal) : null;
+
     const laporan = await laporanModel.findAndCountAll({
       attributes: {
         exclude: ["createdAt", "updatedAt"],
@@ -57,6 +77,13 @@ async function getListLaporan(req, res) {
           model: model.user,
           require: true,
           as: "dataUser",
+          where: {
+            [Op.or]: [
+              {
+                nama: { [Op.substring]: nama_pelapor },
+              },
+            ],
+          },
         },
       ],
       where: {
@@ -65,6 +92,11 @@ async function getListLaporan(req, res) {
             judulLaporan: { [Op.substring]: keyword },
             jenisLaporan: { [Op.substring]: jenisLaporan },
             status: { [Op.substring]: status },
+            ...(checkQuery(date) && {
+              tanggalLaporan: {
+                [Op.eq]: date,
+              },
+            }),
           },
         ],
       },

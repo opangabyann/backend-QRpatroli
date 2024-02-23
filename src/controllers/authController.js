@@ -11,7 +11,16 @@ async function login(req, res) {
     const { nopek, password } = payload;
 
     const user = await UserModel.findOne({
-      attributes: ['id', 'nama', 'nopek', 'password', 'role', 'noTelp', 'createdAt', 'updatedAt'],
+      attributes: [
+        "id",
+        "nama",
+        "nopek",
+        "password",
+        "role",
+        "noTelp",
+        "createdAt",
+        "updatedAt",
+      ],
       where: {
         nopek: nopek,
       },
@@ -23,12 +32,7 @@ async function login(req, res) {
         msg: "user tidak ditemukan",
       });
     }
-    if (user.role === "security"){
-      return res.json({
-        status: "Gagal",
-        msg: "hanya admin yang dapat login!!",
-      });
-    }
+
     if (password === null) {
       return res.status(422).json({
         status: "Fail",
@@ -72,6 +76,7 @@ async function login(req, res) {
   }
 }
 
+
 async function tambahUser(req, res) {
   try {
     const payload = req.body;
@@ -81,7 +86,7 @@ async function tambahUser(req, res) {
         nopek: nopek,
       },
     });
-    console.log("existing user ====>",existingUser)
+    console.log("existing user ====>", existingUser);
     // if(req.role !== "superAdmin"){
     //   res.status(400).json({
     //     status: "Gagal",
@@ -96,14 +101,14 @@ async function tambahUser(req, res) {
       });
     }
     let hashPassword = await bcrypt.hashSync(password, 10);
-    
+
     await UserModel.create({
       nama,
       nopek,
       password: hashPassword,
       role,
       noTelp,
-      createdBy: req.id
+      createdBy: req.id,
     });
     res.json({
       status: "Berhasil",

@@ -7,7 +7,7 @@ const checkQuery = require("../utils/queryString");
 async function tambahLog(req, res) {
   try {
     const payload = req.body;
-    const { idTitikPatroli, latitude, longitude, jamPatroli } = payload;
+    const { idTitikPatroli, latitude, longitude, jamPatroli, status } = payload;
 
     await logModel.create({
       idTitikPatroli,
@@ -15,6 +15,7 @@ async function tambahLog(req, res) {
       latitude,
       longitude,
       jamPatroli,
+      status,
       tanggalPatroli: dayjs().format("YYYY-MM-DD"),
     });
     res.json({
@@ -32,8 +33,20 @@ async function tambahLog(req, res) {
   }
 }
 async function getListLog(req, res) {
-  const { keyword, page, pageSize, offset, dari_jam,sampai_jam } = req.query;
+  const {
+    page,
+    pageSize,
+    offset,
+    dari_jam,
+    sampai_jam,
+    tanggal,
+    status,
+    nama_petugas,
+  } = req.query;
   try {
+    const date = tanggal ? new Date(tanggal) : null;
+
+    console.log(tanggal, date);
     const log = await logModel.findAndCountAll({
       attributes: {
         exclude: ["updatedAt"],
@@ -45,6 +58,13 @@ async function getListLog(req, res) {
           require: true,
           as: "logUser",
           attributes: ["id", "nama", "nopek"],
+          where: {
+            [Op.or]: [
+              {
+                nama: { [Op.substring]: nama_petugas },
+              },
+            ], // Filter null values jika role atau keyword kosong
+          },
         },
         {
           model: model.titikPatroli,
@@ -54,11 +74,18 @@ async function getListLog(req, res) {
         },
       ],
 
-      where : {
-        ...(checkQuery(keyword) && {
-          jamPatroli : {
-            [Op.between] : [dari_jam, sampai_jam]
-          }
+      where: {
+        ...(checkQuery(status) && { status: { [Op.eq]: status } }),
+
+        ...(checkQuery(dari_jam, sampai_jam) && {
+          jamPatroli: {
+            [Op.between]: [dari_jam, sampai_jam],
+          },
+        }),
+        ...(checkQuery(date) && {
+          tanggalPatroli: {
+            [Op.eq]: date,
+          },
         }),
       },
       limit: pageSize,
@@ -153,11 +180,75 @@ async function detaillog(req, res) {
     });
   }
 }
+
+async function detailByIdLog(req, res) {
+  try {
+    const { id } = req.params;
+    const { page, pageSize, offset, dari_jam, sampai_jam, tanggal, status } =
+      req.query;
+    const date = tanggal ? new Date(tanggal) : null;
+    console.log(tanggal, date);
+
+    const log = await logModel.findAndCountAll({
+      attributes: {
+        exclude: ["updatedAt"],
+      },
+      limit: pageSize,
+      offset: offset,
+      where: {
+        idUser: id,
+        ...(checkQuery(dari_jam, sampai_jam) && {
+          jamPatroli: {
+            [Op.between]: [dari_jam, sampai_jam],
+          },
+        }),
+        ...(checkQuery(status) && { status: { [Op.eq]: status } }),
+        ...(checkQuery(date) && {
+          tanggalPatroli: {
+            [Op.eq]: date,
+          },
+        }),
+      },
+      include: [
+        {
+          model: model.user,
+          require: true,
+          as: "logUser",
+          attributes: ["id", "nama", "nopek"],
+        },
+        {
+          model: model.titikPatroli,
+          require: true,
+          as: "titikPatroli",
+          attributes: ["id", "nama", "latitude", "longitude"],
+        },
+      ],
+    });
+    res.json({
+      status: "Berhasil",
+      msg: "detail log berhasil ditemukan",
+      data: log,
+      pagination: {
+        currentPage: page,
+        pageSize: pageSize,
+        // totalData: ,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({
+      status: "Gagal",
+      msg: "ada kesalahan",
+    });
+  }
+}
 async function updatelog(req, res) {
   try {
     const { id } = req.params;
     const payload = req.body;
-    const { idTitikPatroli, latitude, longitude, jamPatroli } = payload;
+    const { idTitikPatroli, latitude, longitude, jamPatroli, status, idUser } =
+      payload;
+    console.log(idTitikPatroli, latitude, longitude, jamPatroli, status);
     const log = await logModel.findByPk(id);
 
     if (log === null) {
@@ -170,10 +261,11 @@ async function updatelog(req, res) {
     await logModel.update(
       {
         idTitikPatroli,
-        idUser: req.id,
+        idUser,
         latitude,
         longitude,
         jamPatroli,
+        status: status,
       },
       {
         where: {
@@ -186,6 +278,7 @@ async function updatelog(req, res) {
       msg: "log patroli berhasil diupdate",
     });
   } catch (error) {
+    console.log(error);
     res.json({
       status: "Gagal",
       msg: "ada kesalahan",
@@ -198,4 +291,5 @@ module.exports = {
   deletelog,
   detaillog,
   updatelog,
+  detailByIdLog,
 };

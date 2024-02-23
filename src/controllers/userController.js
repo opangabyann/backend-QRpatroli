@@ -23,7 +23,6 @@ async function getListUser(req, res) {
             },
           ],
         },
-        
       ],
       where: {
         role: ["security", "admin"],
@@ -37,6 +36,7 @@ async function getListUser(req, res) {
       limit: pageSize,
       offset: offset,
     });
+
     console.log(user);
     return res.json({
       status: "Berhasil",
@@ -44,10 +44,9 @@ async function getListUser(req, res) {
       pagination: {
         currentPage: page,
         pageSize: pageSize,
-        totalData: user.count,
+        totalData: user.rows.length,
       },
       data: user,
-      
     });
   } catch (error) {
     console.log(error);
@@ -100,7 +99,7 @@ async function getListUserSecurity(req, res) {
       pagination: {
         currentPage: page,
         pageSize: pageSize,
-        totalData: user.count,
+        totalData: user.rows.length,
       },
       data: user,
     });
@@ -215,7 +214,6 @@ async function updateUser(req, res) {
         nopek,
         role,
         noTelp,
-        updatedBy : req.id
       },
       {
         where: {
